@@ -51,4 +51,14 @@ ggplot(alta, aes(x="", y=Casos, fill=Alta_Medica)) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) + theme_void()
 
+#BarPlot por semana de contagio
+semana <- data.frame(table(d2$semanaContagio))
+colnames(semana) <- c("Semana", "Casos")
+ggplot(data=semana, aes(x=Semana, y=Casos, fill=Semana)) +
+  geom_bar(stat="identity", width=0.7, color="white") + coord_flip()
+
+
+
+
+
 
