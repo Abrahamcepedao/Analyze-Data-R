@@ -9,7 +9,6 @@ head(d)
 dim(d)
 d2 <- as.data.frame(d)
 head(d2)
-
 data.frame(prop.table(table(d2$institucion, d2$rangoedad),2))
 
 #BarPlot por institucion
@@ -58,7 +57,12 @@ ggplot(data=semana, aes(x=Semana, y=Casos, fill=Semana)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip()
 
 
-
+#LinePlot por contagios diarios y acumulados
+casos <- as.data.frame(read_excel("Seguimiento_a_casos.xlsm", sheet = "Contagios"))
+colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
+ggplot(casos, aes(x=Fecha,)) +
+    geom_line( aes(y=Contagios), color="#69b3a2", size=1, alpha=0.9, linetype=1) + 
+    geom_line( aes(y=Acumulados), color="#69b3a2", size=1, alpha=0.9, linetype=1)
 
 
 
