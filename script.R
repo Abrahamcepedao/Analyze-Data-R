@@ -4,7 +4,7 @@ library(readxl)
 library(ggplot2)
 
 setwd("~/Documents/OnCampusJob/script_r/Analyze-Data-R")
-d <- read_excel("Seguimiento a casos.xlsm", sheet = "BD")
+d <- read_excel("Seguimiento_a_casos.xlsm", sheet = "BD")
 head(d)
 dim(d)
 d2 <- as.data.frame(d)
@@ -31,7 +31,7 @@ colnames(r_edad) <- c("Rango","Casos")
 ggplot(data=r_edad, aes(x=Rango, y=Casos, fill=Rango)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip()
 
-#Piechar por genero
+#Piechart por genero
 genero <- data.frame(table(d2$genero))
 colnames(genero) <- c("Genero", "Casos")
 ggplot(genero, aes(x="", y=Casos, fill=Genero)) +
@@ -43,5 +43,12 @@ diag <- data.frame(table(d2$diagnostico))
 colnames(diag) <- c("Diagnostico", "Casos")
 ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip()
+
+#Piechart por alta medica
+alta <- data.frame(table(d2$alta))
+colnames(alta) <- c("Alta_Medica", "Casos")
+ggplot(alta, aes(x="", y=Casos, fill=Alta_Medica)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) + theme_void()
 
 
