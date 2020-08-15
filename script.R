@@ -3,14 +3,11 @@ rm(list=ls())
 library(readxl)
 library(ggplot2)
 library(scales)
+library(dplyr)
 
 setwd("~/Documents/OnCampusJob/script_r/Analyze-Data-R")
 d <- read_excel("Seguimiento_a_casos.xlsm", sheet = "BD")
-head(d)
-dim(d)
 d2 <- as.data.frame(d)
-head(d2)
-data.frame(prop.table(table(d2$institucion, d2$rangoedad),2))
 
 #BarPlot por institucion
 inst <- data.frame(table(d2$institucion))
@@ -55,13 +52,16 @@ ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   ggtitle("Por diagnóstico")
 
 #Piechart por alta medica
-alta <- data.frame(table(d2$alta))
-colnames(alta) <- c("Alta_Medica", "Casos")
+alta <- data.frame(table(d2$alta), data.frame(prop.table(table(d2$alta)))$Freq*100)
+colnames(alta) <- c("Alta_Medica", "Casos", "prop")
+alta <- alta %>%
+  arrange(desc(Alta_Medica)) %>%
+  mutate(lab.ypos = cumsum(prop) - 0.5*prop)
+
 ggplot(alta, aes(x="", y=Casos, fill=Alta_Medica)) +
   geom_bar(stat="identity", width=1, color="white") +
-  coord_polar("y", start=0) + theme_void() + 
-  geom_text(aes(label = paste(round(Casos / sum(Casos) * 100, 1), "%"), x = 1.3),
-  position = position_stack(vjust = 0.5)) +
+  coord_polar("y", start=0) + theme_void() +
+  geom_text(aes(y = lab.ypos, label = prop), color = "white") +
   ggtitle("Por alta medica")
 
 #BarPlot por semana de contagio
@@ -92,11 +92,9 @@ ggplot(data=casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Contagios, fill=
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 20)) +
   theme(text = element_text(size=15)) + stat_smooth(colour="green")
 
-  
-
 
 #BarPlot por estado
-estado <- data.frame(table(d2$estado))
+estado <- data.frame(sort(table(d2$estado), decreasing = TRUE))
 colnames(estado) <- c("Estado", "Casos")
 ggplot(data=estado, aes(x=Estado, y=Casos, fill=Estado)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() +
@@ -107,8 +105,8 @@ ggplot(data=estado, aes(x=Estado, y=Casos, fill=Estado)) +
 tipo_cont <- data.frame(table(d2$tipoContagio))
 colnames(tipo_cont) <- c("Tipo_Contagio", "Casos")
 ggplot(data=tipo_cont, aes(x=Tipo_Contagio, y=Casos, fill=Tipo_Contagio)) +
-  geom_bar(stat="identity", width=0.7, color="white") + coord_flip() +
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_bar(stat="identity", width=0.7, color="white") +
+  geom_text(aes(label = Casos), vjust = -0.2) +
   ggtitle("Por tipo de contagio")
 
 
@@ -131,7 +129,7 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
 #BarPlot institucion contra tipo de colaborador
 inst_colab <- data.frame(prop.table(table(d2$institucion, d2$tipo),2))
 colnames(inst_colab) <- c("Institucion", "Colaborador", "Casos")
-ggplot(inst_colab, aes(fill=Institucion, y=Colaborador, x=Casos)) + 
+ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) + 
   geom_bar(position="stack", stat="identity") +
   ggtitle("Institución contra tipo de colaborador")
 
