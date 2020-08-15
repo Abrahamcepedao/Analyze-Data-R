@@ -2,6 +2,7 @@ rm(list=ls())
 
 library(readxl)
 library(ggplot2)
+library(scales)
 
 setwd("~/Documents/OnCampusJob/script_r/Analyze-Data-R")
 d <- read_excel("Seguimiento_a_casos.xlsm", sheet = "BD")
@@ -72,13 +73,27 @@ ggplot(data=semana, aes(x=Semana, y=Casos, fill=Semana)) +
   ggtitle("Por semana de contagio")
 
 
-#LinePlot por contagios diarios y acumulados
+#LinePlot por contagios acumulados
 casos <- as.data.frame(read_excel("Seguimiento_a_casos.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
-ggplot(casos, aes(x=Fecha,)) +
-  geom_line( aes(y=Contagios), color="#69b3a2", size=1, alpha=0.9, linetype=1) + 
-  geom_line( aes(y=Acumulados), color="#69b3a2", size=1, alpha=0.9, linetype=1) +
-  ggtitle("Contagios diarios contra acumulados")
+ggplot(casos, aes(x=Fecha, y=Acumulados)) +
+  geom_area( fill="#69b3a2", alpha=0.4) +
+  geom_line(color="#69b3a2", size=2) +
+  geom_point(size=3, color="#69b3a2") +
+  ggtitle("Contagios acumulados")
+
+
+#BarPlot por contagios diarios
+ggplot(data=casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Contagios, fill=Contagios)) +
+  geom_bar(stat = "identity", position="identity") +
+  ggtitle("Número de casos Covid-19 por fecha de inicio de síntomas (Nacional)") +
+  xlab("Fecha de inicio de síntomas") + ylab("Número de casos") +
+  scale_x_date(labels=date_format("%b %d"), breaks=date_breaks("2 weeks")) +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 20)) +
+  theme(text = element_text(size=15)) + stat_smooth(colour="green")
+
+  
+
 
 #BarPlot por estado
 estado <- data.frame(table(d2$estado))
@@ -121,4 +136,12 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
   geom_bar(position="stack", stat="identity") +
   ggtitle("Rango de edad contra campus")
 
+## more
 
+
+#geom_text(aes(x=fecha[80], label="\nApertura", y=5000), colour="red", angle=90, size=6)
+#stat_smooth(colour="green)
+#d <- data.frame(table(col1, col 2))
+#write.csv(d, ".csv", row.names=FALSE)
+#brewer
+#virids
