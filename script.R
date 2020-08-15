@@ -18,7 +18,7 @@ colnames(inst) <- c("Institucion","Casos")
 ggplot(data=inst, aes(x=Institucion, y=Casos, fill=Institucion)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
   geom_text(aes(label = Casos), hjust = -0.2) +
-  ggtitle("Por institucion")
+  ggtitle("Por institución")
 
 #Piechart por Tipo de colaborador
 t_colab <- data.frame(table(d2$tipo))
@@ -44,7 +44,7 @@ ggplot(genero, aes(x="", y=Casos, fill=Genero)) +
   coord_polar("y", start=0) + theme_void() + 
   geom_text(aes(label = paste(round(Casos / sum(Casos) * 100, 1), "%"), x = 0.5),
   position = position_stack(vjust = 0.5)) +
-  ggtitle("Por genero")
+  ggtitle("Por género")
 
 #BarPlot por diagnostico
 diag <- data.frame(table(d2$diagnostico))
@@ -52,7 +52,7 @@ colnames(diag) <- c("Diagnostico", "Casos")
 ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
   geom_text(aes(label = Casos), hjust = -0.2) +
-  ggtitle("Por diagnostico")
+  ggtitle("Por diagnóstico")
 
 #Piechart por alta medica
 alta <- data.frame(table(d2$alta))
@@ -114,14 +114,6 @@ ggplot(data=tipo_cont, aes(x=Tipo_Contagio, y=Casos, fill=Tipo_Contagio)) +
 
 #<-------------------------Cruzadas------------------------------->
 
-
-#BarPlot tipo de institucion que otorga el servicio contra el campus
-inst_camp <- data.frame(prop.table(table(d2$institucion, d2$campus),2))
-colnames(inst_camp) <- c("Institucion", "Campus", "Casos")
-ggplot(inst_camp, aes(fill=Institucion, y=Campus, x=Casos)) + 
-  geom_bar(position="stack", stat="identity") +
-  ggtitle("Tipo de institucion contra campus")
-
 #BarPlot tipo de empleado contra el campus
 emp_camp <- data.frame(prop.table(table(d2$tipo, d2$campus),2))
 colnames(emp_camp) <- c("Empleado", "Campus", "Casos")
@@ -135,6 +127,13 @@ colnames(edad_camp) <- c("Rango_Edad", "Campus", "Casos")
 ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) + 
   geom_bar(position="stack", stat="identity") +
   ggtitle("Rango de edad contra campus")
+
+#BarPlot institucion contra tipo de colaborador
+inst_colab <- data.frame(prop.table(table(d2$institucion, d2$tipo),2))
+colnames(inst_colab) <- c("Institucion", "Colaborador", "Casos")
+ggplot(inst_colab, aes(fill=Institucion, y=Colaborador, x=Casos)) + 
+  geom_bar(position="stack", stat="identity") +
+  ggtitle("Institución contra tipo de colaborador")
 
 ## more
 
