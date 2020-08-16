@@ -34,6 +34,24 @@ d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
 
+d2$semanaContagio <- str_trim(d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er abril", "1ra abril", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er marzo", "1ra marzo", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er mayo", "1ra mayo", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er agosto", "1ra agosto", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1era julio", "1ra julio", d2$semanaContagio)
+
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er marzo", "3ra marzo", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er abril", "3ra abril", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er mayo", "3ra mayo", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er marzo", "3ra marzo", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3era junio", "3ra junio", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er julio", "3ra julio", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Julio", "4ta julio", d2$semanaContagio)
+
+
+semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta")
+meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "noviembre")
 
 #BarPlot por institucion
 inst <- data.frame(table(d2$institucion))
@@ -126,13 +144,22 @@ ggplot(alta, aes(x="", y=prop, fill=Alta_Médica )) +
 #BarPlot por semana de contagio
 semana <- data.frame(table(d2$semanaContagio))
 colnames(semana) <- c("Semana", "Casos")
-ggplot(data=semana, aes(x=Semana, y=Casos, fill=Semana)) +
-  geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
+
+semana$semana_num <- substr(semana$Semana,1,3)
+semana$mes <- str_trim(substring(semana$Semana,4))
+semana$semana_num <- factor(semana$semana_num, levels = semana_num)
+semana$mes <- factor(semana$mes, levels = meses)
+semana <- data.frame(semana[order(semana$mes,semana$semana_num),])
+semana$Semana <- factor(semana$Semana, levels = rev(semana$Semana))
+semana$Casos <- rev(semana$Casos)
+
+ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
+  geom_bar(stat="identity", width=0.7, color="white") +
   geom_text(aes(label = Casos), hjust = -0.2) +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) +
+  theme(text = element_text(size=15)) + 
   scale_fill_viridis_d()
 
 
@@ -191,17 +218,24 @@ ggplot(data=tipo_cont, aes(x=Tipo_Contagio, y=Casos, fill=Tipo_Contagio)) +
 #BarPlot tipo de empleado contra el campus
 emp_camp <- data.frame(prop.table(table(d2$tipo, d2$campus),2))
 colnames(emp_camp) <- c("Empleado", "Campus", "Casos")
+campuss <- data.frame(table(d2$campus))
+campuss <- campuss[campuss$Freq>5,]
+emp_camp <- emp_camp[emp_camp$Campus %in% campuss$Var1,]
 ggplot(emp_camp, aes(fill=Empleado, y=Campus, x=Casos)) + 
   geom_bar(position="stack", stat="identity") +
   xlab("Porcentaje de casos") + ylab("Campus") +
   scale_fill_brewer() +
+  guides(fill=guide_legend(title="Colaborador")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=13)) +
-  ggtitle("Porcentaje de casos Covid-19 por tipo de empleado contra campus")
+  ggtitle("Porcentaje de casos Covid-19 por tipo de colaborador contra campus (total mayor que 5)")
 
 #BarPlot rango de edad contra campus
 edad_camp <- data.frame(prop.table(table(d2$rangoedad, d2$campus),2))
 colnames(edad_camp) <- c("Rango_Edad", "Campus", "Casos")
+campus <- data.frame(table(d2$campus))
+campus <- campus[campus$Freq>5,]
+edad_camp <- edad_camp[edad_camp$Campus %in% campus$Var1,]
 ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) + 
   geom_bar(position="stack", stat="identity") +
   xlab("Porcentaje de casos") + ylab("Campus") +
@@ -209,7 +243,7 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
   guides(fill=guide_legend(title="Rango de edad")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=13)) +
-  ggtitle("Porcentaje de casos Covid-19 por rango de edad contra campus")
+  ggtitle("Porcentaje de casos Covid-19 por rango de edad contra campus (total mayor que 5)")
 
 #BarPlot institucion contra tipo de colaborador
 inst_colab <- data.frame(prop.table(table(d2$tipo, d2$institucion),2))
@@ -227,6 +261,5 @@ ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) +
 #Stargazer R
 camp_colab <- table(d2$campus, d2$tipo)
 #filter table
-
 write.csv(camp_colab, file = "campus_contra_colaborador.csv")
 
