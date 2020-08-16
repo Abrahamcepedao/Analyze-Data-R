@@ -206,6 +206,7 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
   geom_bar(position="stack", stat="identity") +
   xlab("Porcentaje de casos") + ylab("Campus") +
   scale_fill_brewer() +
+  guides(fill=guide_legend(title="Rango de edad")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=13)) +
   ggtitle("Porcentaje de casos Covid-19 por rango de edad contra campus")
@@ -222,8 +223,10 @@ ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) +
   ggtitle("Porcentaje de casos Covid-19 por institución contra tipo de colaborador")
 
 
+#Tabla cruzada campus contra tipo de colaborados
+#Stargazer R
+camp_colab <- table(d2$campus, d2$tipo)
+#filter table
 
-
-
-
+write.csv(camp_colab, file = "campus_contra_colaborador.csv")
 
