@@ -62,7 +62,7 @@ ggplot(data=inst, aes(x=Institución, y=Casos, fill=Institución)) +
   ggtitle("Número de casos Covid-19 por institución") +
   xlab("Institución") + ylab("Número de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
   scale_fill_viridis_d()
 
 #Piechart por Tipo de colaborador
@@ -167,7 +167,7 @@ ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + 
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
   scale_fill_viridis_d()
 
 semana2 <- data.frame(table(d2$semanaContagio, d2$tipo))
@@ -184,7 +184,7 @@ ggplot(data=semana2, aes(x=Casos, y=Semana, fill=Colaborador)) +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio contra tipo de colaborador") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + 
+  theme(text = element_text(size=15)) +
   scale_fill_viridis_d()
 
 
@@ -221,7 +221,7 @@ ggplot(data=estado, aes(x=Estado, y=Casos, fill=Estado)) +
   xlab("Estado") + ylab("Número de casos") +
   scale_fill_viridis_d() +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
   ggtitle("Número de casos Covid-19 por estado")
 
 #BarPlot por tipo de contagio
@@ -255,6 +255,20 @@ ggplot(emp_camp, aes(fill=Empleado, y=Campus, x=Casos)) +
   theme(text = element_text(size=13)) +
   ggtitle("Porcentaje de casos Covid-19 por tipo de colaborador contra campus (total mayor que 5)")
 
+emp_camp2 <- data.frame(table(d2$tipo, d2$campus),2)
+colnames(emp_camp2) <- c("Empleado", "Campus", "Casos")
+campuss <- data.frame(table(d2$campus))
+campuss <- campuss[campuss$Freq>5,]
+emp_camp2 <- emp_camp2[emp_camp2$Campus %in% campuss$Var1,]
+ggplot(emp_camp2, aes(fill=Empleado, y=Campus, x=Casos)) + 
+  geom_bar(position="stack", stat="identity") +
+  xlab("Porcentaje de casos") + ylab("Campus") +
+  scale_fill_viridis_d() +
+  guides(fill=guide_legend(title="Colaborador")) +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=13)) +
+  ggtitle("Número de casos Covid-19 por tipo de colaborador contra campus (total mayor que 5)")
+
 #BarPlot rango de edad contra campus
 edad_camp <- data.frame(prop.table(table(d2$rangoedad, d2$campus),2))
 colnames(edad_camp) <- c("Rango_Edad", "Campus", "Casos")
@@ -269,6 +283,8 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=13)) +
   ggtitle("Porcentaje de casos Covid-19 por rango de edad contra campus (total mayor que 5)")
+
+  
 
 #BarPlot institucion contra tipo de colaborador
 inst_colab <- data.frame(prop.table(table(d2$tipo, d2$institucion),2))
