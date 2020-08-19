@@ -356,7 +356,22 @@ ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) +
   ggtitle("Número de casos Covid-19 hospitalizados por campus") +
   scale_fill_viridis_d() 
 
+#Bar Plot dato generales (casos totales, %de casos hospitalizados, diferencia de con semana anterior)
+nums <- data.frame(c("Casos totales", "Porcentaje de hospitalización", "Diferencia con semana anterior"),c(dim(d2)[1], dim(data.frame(d2[d2$diagnostico == "Hospitalizado",]))[1]/dim(d2)[1]*100, semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]))
+general_data <- data.frame(
+  Dato = c("Casos totales", "Porcentaje de hospitalización", "Diferencia con semana anterior"),
+  Casos = c(dim(d2)[1], dim(data.frame(d2[d2$diagnostico == "Hospitalizado",]))[1]/dim(d2)[1]*100, semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]),
+  stringsAsFactors = FALSE
+)
 
+ggplot(general_data, aes(fill=Dato, y=Casos, x=Dato)) + 
+  geom_bar(position="stack", stat="identity") + coord_flip() + 
+  ylab("Número/Porcentaje de casos") + xlab("") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
+  geom_text(aes(label = ifelse(Dato == "Porcentaje de hospitalización", paste(round(Casos,2), "%", sep=""), Casos)), hjust = -0.2) +
+  ggtitle("Resumen de datos generales Covid-19") +
+  scale_fill_viridis_d() 
 
 #<-------------------------Tabla csv------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
