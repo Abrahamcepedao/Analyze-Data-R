@@ -56,6 +56,9 @@ d2$tipo <- ifelse(d2$tipo == "3=Apoyo académico", "Apoyo Académico", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "4=Operativo", "Operativo", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "5=Clínico", "Clínico", d2$tipo)
 
+d2$diagnostico <- ifelse(d2$diagnostico == "1=Ambulatorio", "Ambulatorio", d2$diagnostico)
+d2$diagnostico <- ifelse(d2$diagnostico == "2=Hospitalizado", "Hospitalizado", d2$diagnostico)
+
 
 semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta")
 meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "noviembre")
@@ -327,8 +330,35 @@ ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) +
   ggtitle("Porcentaje de casos Covid-19 por institución contra tipo de colaborador")
 
 
-#Tabla cruzada campus contra tipo de colaborados
-#Stargazer R
+#<-------------------------graficas filtradas------------------------------->
+
+#BarPlot hospitalizados por institución
+inst_hos <- data.frame(table(d2$institucion[d2$diagnostico == "Hospitalizado"]))
+colnames(inst_hos) <- c("Institucion", "Casos")
+ggplot(inst_hos, aes(fill=Institucion, y=Casos, x=Institucion)) + 
+  geom_bar(position="stack", stat="identity") + coord_flip() + 
+  xlab("Número de casos") + ylab("Institución") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
+  geom_text(aes(label = Casos), hjust = -0.2) +
+  ggtitle("Número de casos Covid-19 hospitalizados por institución") +
+  scale_fill_viridis_d() 
+
+#BarPlot hospitalizados por campus
+campus_hos <- data.frame(table(d2$campus[d2$diagnostico == "Hospitalizado"]))
+colnames(campus_hos) <- c("Campus", "Casos")
+ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) + 
+  geom_bar(position="stack", stat="identity") + coord_flip() + 
+  xlab("Número de casos") + ylab("Campus") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
+  geom_text(aes(label = Casos), hjust = -0.2) +
+  ggtitle("Número de casos Covid-19 hospitalizados por campus") +
+  scale_fill_viridis_d() 
+
+
+
+#<-------------------------Tabla csv------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
 #filter table
 write.csv(camp_colab, file = "campus_contra_colaborador2.csv")
