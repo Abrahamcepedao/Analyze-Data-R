@@ -356,11 +356,11 @@ ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) +
   ggtitle("Número de casos Covid-19 hospitalizados por campus") +
   scale_fill_viridis_d() 
 
-#Bar Plot dato generales (casos totales, %de casos hospitalizados, diferencia de con semana anterior)
-nums <- data.frame(c("Casos totales", "Porcentaje de hospitalización", "Diferencia con semana anterior"),c(dim(d2)[1], dim(data.frame(d2[d2$diagnostico == "Hospitalizado",]))[1]/dim(d2)[1]*100, semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]))
+#Bar Plot dato generales (casos totales, %de casos hospitalizados, diferencia de con semana anterior, positividad general)
+data <- data.frame(read_excel("Tasas_y_Poblacion_Tec_16072020.xlsx", sheet = "Población Tec"))
 general_data <- data.frame(
-  Dato = c("Casos totales", "Porcentaje de hospitalización", "Diferencia con semana anterior"),
-  Casos = c(dim(d2)[1], dim(data.frame(d2[d2$diagnostico == "Hospitalizado",]))[1]/dim(d2)[1]*100, semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]),
+  Dato = c("Casos totales", "Diferencia con semana anterior"),
+  Casos = c(dim(d2)[1], semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]),
   stringsAsFactors = FALSE
 )
 
@@ -369,9 +369,68 @@ ggplot(general_data, aes(fill=Dato, y=Casos, x=Dato)) +
   ylab("Número/Porcentaje de casos") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
-  geom_text(aes(label = ifelse(Dato == "Porcentaje de hospitalización", paste(round(Casos,2), "%", sep=""), Casos)), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2) +
   ggtitle("Resumen de datos generales Covid-19") +
   scale_fill_viridis_d() 
+
+general_data2 <- data.frame(
+  Dato = c("Porcentaje de hospitalización", "Porcentaje de fallecimiento", "Porcentaje de contagios (total)"),
+  Casos = c(dim(data.frame(d2[d2$diagnostico == "Hospitalizado",]))[1]/dim(d2)[1]*100, dim(d2[!is.na(d2$fechaFallecimiento),])[1]/dim(d2)[1]*100, dim(d2)[1]/sum(data$TOTAL.Colaboradores)*100),
+  stringsAsFactors = FALSE
+)
+
+ggplot(general_data2, aes(fill=Dato, y=Casos, x=Dato)) + 
+  geom_bar(position="stack", stat="identity") + 
+  ylab("") + xlab("") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=17)) + theme(legend.position="none") +
+  geom_text(aes(label = paste(round(Casos,2), "%", sep="")), vjust = -0.2, size=8) +
+  ggtitle("Porcentajes de datos generales Covid-19") +
+  scale_fill_viridis_d() 
+
+general_data3 <- data.frame(
+  Semana = c("Semana min", "Semana max", "Semana anterior", "Semana actual", "Diferencia"),
+  Casos = c(min(semana$Casos), max(semana$Casos), semana$Casos[dim(semana)[1]-1], semana$Casos[dim(semana)[1]], semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]),
+  stringsAsFactors = FALSE
+)
+semanas <-  c("Semana min", "Semana max", "Semana anterior", "Semana actual", "Diferencia")
+general_data3$Semana <- factor(general_data3$Semana, levels = semanas)
+
+ggplot(general_data3, aes(fill=Semana, y=Casos, x=Semana)) + 
+  geom_bar(position="stack", stat="identity") + 
+  ylab("") + xlab("") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=17)) + theme(legend.position="none") +
+  geom_text(aes(label = Casos), vjust = -0.2, size=8) +
+  ggtitle("Datos respecto a contagios semanales Covid-19") +
+  scale_fill_viridis_d() 
+
+max_campus <- data.frame(table(d2$campus))
+max_campus <- max_campus[order(max_campus$Freq),]
+max_inst <- data.frame(table(d2$institucion))
+max_inst <- max_inst[order(max_inst$Freq),]
+
+general_data4 <- data.frame(
+  Dato = c(paste("Campus max (", max_campus$Var1[dim(max_campus)][1], ")", sep=""), paste("Institución max (", max_inst$Var1[dim(max_inst)][1], ")", sep=""), "Casos totales"),
+  Casos = c(max_campus$Freq[dim(max_campus)][1], max_inst$Freq[dim(max_inst)][1], dim(d2)[1]),
+  stringsAsFactors = FALSE
+)
+data4_order <- c(paste("Campus max (", max_campus$Var1[dim(max_campus)][1], ")", sep=""), paste("Institución max (", max_inst$Var1[dim(max_inst)][1], ")", sep=""), "Casos totales")
+general_data4$Dato <- factor(general_data4$Dato, data4_order)
+
+ggplot(general_data4, aes(fill=Dato, y=Casos, x=Dato)) + 
+  geom_bar(position="stack", stat="identity") + 
+  ylab("") + xlab("") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=17)) + theme(legend.position="none") +
+  geom_text(aes(label = Casos), vjust = -0.2, size=8) +
+  ggtitle("Datos de casos totales Covid-19") +
+  scale_fill_viridis_d() 
+
+
+#<-------------------------graficas porcentuales------------------------------->
+
+
 
 #<-------------------------Tabla csv------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
