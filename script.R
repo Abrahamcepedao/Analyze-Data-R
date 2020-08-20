@@ -338,7 +338,7 @@ inst_hos <- data.frame(table(d2$institucion[d2$diagnostico == "Hospitalizado"]))
 colnames(inst_hos) <- c("Institucion", "Casos")
 ggplot(inst_hos, aes(fill=Institucion, y=Casos, x=Institucion)) + 
   geom_bar(position="stack", stat="identity") + coord_flip() + 
-  xlab("Número de casos") + ylab("Institución") +
+  xlab("Institución") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
   geom_text(aes(label = Casos), hjust = -0.2) +
@@ -350,7 +350,7 @@ campus_hos <- data.frame(table(d2$campus[d2$diagnostico == "Hospitalizado"]))
 colnames(campus_hos) <- c("Campus", "Casos")
 ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) + 
   geom_bar(position="stack", stat="identity") + coord_flip() + 
-  xlab("Número de casos") + ylab("Campus") +
+  xlab("Campus") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
   geom_text(aes(label = Casos), hjust = -0.2) +
@@ -416,8 +416,27 @@ ggplot(general_data4, aes(fill=Dato, y=Casos, x=Dato)) +
 
 
 #<-------------------------graficas porcentuales------------------------------->
+data$Campus <- ifelse(data$Campus == "Central de Veracruz", "Veracruz", data$Campus)
+data$Campus <- ifelse(data$Campus == "Santa Fe", "Santa Fé", data$Campus)
+data$Campus <- ifelse(data$Campus == "Sonora Norte", "Sonora", data$Campus)
 
+campus_comp <- d2[d2$campus %in% data$Campus,]
+campus_comp <- data.frame(table(campus_comp$campus))
+campus_totales <- data[data$Campus %in% campus_comp$campus,]
+campus_totales <- data.frame(campus_totales$Campus, campus_totales$TOTAL.Colaboradores)
+campus_totales <- campus_totales[order(campus_totales$campus_totales.Campus),]
+campus_comp$total <- campus_totales$campus_totales.TOTAL.Colaboradores
+colnames(campus_comp) <- c("Campus", "Casos", "Total")
 
+ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) + 
+  geom_bar(position="stack", stat="identity") + 
+  ylab("") + xlab("") + coord_flip() +
+  xlab("Porcentage de tasa de contagio") + ylab("Campus") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=17)) + theme(legend.position="none") +
+  geom_text(aes(label = paste(round(Casos/Total*100,2), "%", sep = "")), hjust = -0.05, size=5) +
+  ggtitle("Tasa de contagio por campus Covid-19") + 
+  scale_fill_viridis_d() 
 
 #<-------------------------Tabla csv------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
