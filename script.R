@@ -34,6 +34,7 @@ d2$campus <- ifelse(d2$campus == "Guarderia Tec", "Guardería Tec", d2$campus)
 d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
+d2$estado <- ifelse(d2$estado == "Veracruz", "Veracrúz", d2$estado)
 
 d2$semanaContagio <- str_trim(d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er abril", "1ra abril", d2$semanaContagio)
@@ -358,20 +359,6 @@ ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) +
 
 #Bar Plot dato generales (casos totales, %de casos hospitalizados, diferencia de con semana anterior, positividad general)
 data <- data.frame(read_excel("Tasas_y_Poblacion_Tec_16072020.xlsx", sheet = "Población Tec"))
-general_data <- data.frame(
-  Dato = c("Casos totales", "Diferencia con semana anterior"),
-  Casos = c(dim(d2)[1], semana$Casos[dim(semana)[1]]-semana$Casos[dim(semana)[1]-1]),
-  stringsAsFactors = FALSE
-)
-
-ggplot(general_data, aes(fill=Dato, y=Casos, x=Dato)) + 
-  geom_bar(position="stack", stat="identity") + coord_flip() + 
-  ylab("Número/Porcentaje de casos") + xlab("") +
-  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), hjust = -0.2) +
-  ggtitle("Resumen de datos generales Covid-19") +
-  scale_fill_viridis_d() 
 
 general_data2 <- data.frame(
   Dato = c("Porcentaje de hospitalización", "Porcentaje de fallecimiento", "Porcentaje de contagios (total)"),
