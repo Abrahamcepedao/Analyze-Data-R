@@ -422,7 +422,7 @@ data$Campus <- ifelse(data$Campus == "Sonora Norte", "Sonora", data$Campus)
 
 campus_comp <- d2[d2$campus %in% data$Campus,]
 campus_comp <- data.frame(table(campus_comp$campus))
-campus_totales <- data[data$Campus %in% campus_comp$campus,]
+campus_totales <- data[data$Campus %in% campus_comp$Var1,]
 campus_totales <- data.frame(campus_totales$Campus, campus_totales$TOTAL.Colaboradores)
 campus_totales <- campus_totales[order(campus_totales$campus_totales.Campus),]
 campus_comp$total <- campus_totales$campus_totales.TOTAL.Colaboradores
@@ -431,7 +431,7 @@ colnames(campus_comp) <- c("Campus", "Casos", "Total")
 ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) + 
   geom_bar(position="stack", stat="identity") + 
   ylab("") + xlab("") + coord_flip() +
-  xlab("Porcentage de tasa de contagio") + ylab("Campus") +
+  xlab("Porcentaje de tasa de contagio") + ylab("Campus") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
   geom_text(aes(label = paste(round(Casos/Total*100,2), "%", sep = "")), hjust = -0.05, size=5) +
