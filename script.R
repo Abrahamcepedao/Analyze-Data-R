@@ -69,7 +69,7 @@ inst <- data.frame(table(d2$institucion))
 colnames(inst) <- c("Institución","Casos")
 ggplot(data=inst, aes(x=Institución, y=Casos, fill=Institución)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   ggtitle("Número de casos Covid-19 por institución") +
   xlab("Institución") + ylab("Número de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
@@ -81,7 +81,7 @@ t_colab <- data.frame(table(d2$tipo), data.frame(prop.table(table(d2$tipo)))$Fre
 colnames(t_colab) <- c("Tipo", "Casos", "prop")
 ggplot(data=t_colab, aes(x=Tipo, y=Casos, fill=Tipo)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   ggtitle("Número de casos Covid-19 por tipo de colaborador") +
   xlab("Colaborador") + ylab("Número de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
@@ -107,7 +107,7 @@ r_edad <- data.frame(table(d2$rangoedad))
 colnames(r_edad) <- c("Rango","Casos")
 ggplot(data=r_edad, aes(x=Rango, y=Casos, fill=Rango)) +
   geom_bar(stat="identity", width=0.7, color="white") + coord_flip() + 
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.05, size=5) +
   xlab("Rango de edad") + ylab("Número de casos") +
   ggtitle("Número de casos Covid-19 por rango de edad") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
@@ -136,7 +136,7 @@ diag <- data.frame(table(d2$diagnostico))
 colnames(diag) <- c("Diagnostico", "Casos")
 ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   geom_bar(stat="identity", width=0.7, color="white") + 
-  geom_text(aes(label = Casos), vjust = -0.2) +
+  geom_text(aes(label = Casos), vjust = -0.2, size=5) +
   xlab("Diagnóstico") + ylab("Número de caso") +
   ggtitle("Número de casos Covid-19 por diagnóstico") +
   guides(fill=guide_legend(title="Diagnóstico")) +
@@ -174,7 +174,7 @@ semana$Semana <- factor(semana$Semana, levels = rev(semana$Semana))
 
 ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
   geom_bar(stat="identity", width=0.7, color="white") +
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
@@ -194,7 +194,7 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
   geom_bar(stat = "identity", width=0.7, color="white") +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio contra tipo de colaborador") +
-  geom_text(aes(label = stat(x), group = Semana), stat = 'summary', fun = sum, hjust = -0.2) +
+  geom_text(aes(label = stat(x), group = Semana), stat = 'summary', fun = sum, hjust = -0.2, size=5) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
   scale_fill_viridis_d()
@@ -341,7 +341,7 @@ ggplot(inst_hos, aes(fill=Institucion, y=Casos, x=Institucion)) +
   xlab("Institución") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   ggtitle("Número de casos Covid-19 hospitalizados por institución") +
   scale_fill_viridis_d() 
 
@@ -353,7 +353,7 @@ ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) +
   xlab("Campus") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), hjust = -0.2) +
+  geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   ggtitle("Número de casos Covid-19 hospitalizados por campus") +
   scale_fill_viridis_d() 
 
@@ -431,7 +431,7 @@ colnames(campus_comp) <- c("Campus", "Casos", "Total")
 ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) + 
   geom_bar(position="stack", stat="identity") + 
   ylab("") + xlab("") + coord_flip() +
-  xlab("Porcentaje de tasa de contagio") + ylab("Campus") +
+  xlab("Campus") + ylab("Porcentaje de tasa de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
   geom_text(aes(label = paste(round(Casos/Total*100,2), "%", sep = "")), hjust = -0.05, size=5) +
