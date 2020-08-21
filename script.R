@@ -7,7 +7,7 @@ library(dplyr)
 library(stringr)
 
 setwd("~/Documents/OnCampusJob/script_r/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_13_08_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_17_08_20.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 colnames(d2) <- c("genero", "institucion", "campus", "estado", "posicion", "tipo", "edad", "rangoedad", "inicio", "semanaContagio", "tipoContagio", "asistidoCampus", "tipoAtencion", "diagnostico", "morbilidades", "alta", "fechaAlta", "fechaFallecimiento")
 
@@ -34,6 +34,7 @@ d2$campus <- ifelse(d2$campus == "Guarderia Tec", "Guardería Tec", d2$campus)
 d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
+d2$estado <- ifelse(d2$estado == "Nuevo Leon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Veracruz", "Veracrúz", d2$estado)
 
 d2$semanaContagio <- str_trim(d2$semanaContagio)
@@ -54,12 +55,14 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Julio", "4ta julio", d2$se
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "2=Apoyo", "Apoyo", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "3=Apoyo académico", "Apoyo Académico", d2$tipo)
+d2$tipo <- ifelse(d2$tipo == "3=Apoyo Académico", "Apoyo Académico", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "4=Operativo", "Operativo", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "5=Clínico", "Clínico", d2$tipo)
 
 d2$diagnostico <- ifelse(d2$diagnostico == "1=Ambulatorio", "Ambulatorio", d2$diagnostico)
 d2$diagnostico <- ifelse(d2$diagnostico == "2=Hospitalizado", "Hospitalizado", d2$diagnostico)
 
+d2$alta <- ifelse(d2$alta == "NO", "No", d2$alta)
 
 semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta")
 meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "noviembre")
@@ -137,7 +140,7 @@ colnames(diag) <- c("Diagnostico", "Casos")
 ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   geom_bar(stat="identity", width=0.7, color="white") + 
   geom_text(aes(label = Casos), vjust = -0.2, size=5) +
-  xlab("Diagnóstico") + ylab("Número de caso") +
+  xlab("Diagnóstico") + ylab("Número de casos") +
   ggtitle("Número de casos Covid-19 por diagnóstico") +
   guides(fill=guide_legend(title="Diagnóstico")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
