@@ -441,7 +441,7 @@ ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) +
   ggtitle("Tasa de contagio por campus Covid-19") + 
   scale_fill_viridis_d() 
 
-#<-------------------------Tabla csv------------------------------->
+#<-------------------------Tabla csv--------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
 #filter table
 write.csv(camp_colab, file = "campus_contra_colaborador2.csv")
