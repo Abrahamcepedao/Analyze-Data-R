@@ -7,9 +7,9 @@ library(dplyr)
 library(stringr)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_24_08_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_31_08_20.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
-colnames(d2) <- c("genero", "institucion", "campus", "estado", "posicion", "tipo", "edad", "rangoedad", "inicio", "semanaContagio", "tipoContagio", "asistidoCampus", "tipoAtencion", "diagnostico", "morbilidades", "alta", "fechaAlta", "fechaFallecimiento")
+colnames(d2) <- c("nomina", "nombre", "genero", "institucion", "campus", "estado", "posicion", "corre", "celular", "tipo", "edad", "rangoedad", "inicio", "semanaContagio", "tipoContagio", "asistidoCampus", "tipoAtencion", "diagnostico", "morbilidades", "alta", "fechaAlta", "fechaFallecimiento")
 
 #Clean data
 d2$tipoContagio <- str_trim(d2$tipoContagio)
@@ -17,6 +17,7 @@ d2$tipoContagio <- ifelse(d2$tipoContagio == "1= Local", "1=Local", d2$tipoConta
 
 d2$campus <- str_trim(d2$campus)
 d2$campus <- ifelse(d2$campus == "Areas de Apoyo", "Áreas de apoyo", d2$campus)
+d2$campus <- ifelse(d2$campus == "Áreas de Apoyo", "Áreas de apoyo", d2$campus)
 d2$campus <- ifelse(d2$campus == "C CM", "Ciudad de México", d2$campus)
 d2$campus <- ifelse(d2$campus == "CCM", "Ciudad de México", d2$campus)
 d2$campus <- ifelse(d2$campus == "C. Querétaro", "Querétaro", d2$campus)
@@ -27,14 +28,26 @@ d2$campus <- ifelse(d2$campus == "C Santa Fe", "Santa Fé", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Laguna", "Laguna", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Ferrería", "Ferrería", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Guadalajara", "Guadalajara", d2$campus)
+d2$campus <- ifelse(d2$campus == "CULIACAN", "Culiacán", d2$campus)
+d2$campus <- ifelse(d2$campus == "Campus Monterrey", "Monterrey", d2$campus)
+d2$campus <- ifelse(d2$campus == "Eugenio Garza Laguera", "EGL", d2$campus)
 d2$campus <- ifelse(d2$campus == "Prog. en línea", "Prog. En línea", d2$campus)
 d2$campus <- ifelse(d2$campus == "Guarderia TEC", "Guardería Tec", d2$campus)
 d2$campus <- ifelse(d2$campus == "Guarderia Tec", "Guardería Tec", d2$campus)
+d2$campus <- ifelse(d2$campus == "O Mazatlán", "Mazatlán", d2$campus)
+d2$campus <- ifelse(d2$campus == "O México", "Ciudad de  México", d2$campus)
+d2$campus <- ifelse(d2$campus == "O Monterrey", "Monterrey", d2$campus)
+d2$campus <- ifelse(d2$campus == "R.  Tec. Mty", "R.  Tec Mty", d2$campus)
+d2$campus <- ifelse(d2$campus == "Santa Fe", "Santa Fé", d2$campus)
 
 d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "Mexico", "Estado de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "Monterrey", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Leon", "Nuevo León", d2$estado)
+d2$estado <- ifelse(d2$estado == "nuevo León", "Nuevo León", d2$estado)
+d2$estado <- ifelse(d2$estado == "SINALOA", "Sinaloa", d2$estado)
 d2$estado <- ifelse(d2$estado == "Veracruz", "Veracrúz", d2$estado)
 
 d2$semanaContagio <- str_trim(d2$semanaContagio)
@@ -83,6 +96,22 @@ ggplot(data=inst, aes(x=Institución, y=Casos, fill=Institución)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
   scale_fill_viridis_d()
 
+inst2 <- data.frame(table(d2$institucion), data.frame(prop.table(table(d2$institucion)))$Freq*100)
+colnames(inst2) <- c("Institución","Casos", "prop")
+inst2 <- inst2 %>%
+  arrange(desc(Institución)) %>%
+  mutate(ypos = cumsum(prop) - 0.5*prop)
+ggplot(inst2, aes(x="", y=prop, fill=Institución)) +
+  geom_bar(stat="identity") +
+  coord_polar("y", start=0) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=6) +
+  theme_void() +
+  ggtitle("Porcentaje de casos Covid-19 por institución") +
+  guides(fill=guide_legend(title="Institución")) +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=20)) +
+  scale_fill_viridis_d(begin = 0.1, end = 0.9)
+
 #Piechart por Tipo de colaborador
 t_colab <- data.frame(table(d2$tipo), data.frame(prop.table(table(d2$tipo)))$Freq*100)
 colnames(t_colab) <- c("Tipo", "Casos", "prop")
@@ -95,19 +124,19 @@ ggplot(data=t_colab, aes(x=Tipo, y=Casos, fill=Tipo)) +
   theme(text = element_text(size=15)) +
   scale_fill_viridis_d()
 
-#t_colab <- t_colab %>%
-  #arrange(desc(Tipo)) %>%
-  #mutate(ypos = cumsum(prop) - 0.5*prop)
-#ggplot(t_colab, aes(x="", y=prop, fill=Tipo)) +
-  #geom_bar(stat="identity", width=1, color="white") +
-  #coord_polar("y", start=0) +
-  #geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "black") +
-  #theme_void() +
-  #ggtitle("Porcentaje de casos Covid-19 por tipo de colaborador") +
-  #guides(fill=guide_legend(title="Tipo de colaborador")) +
-  #theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  #theme(text = element_text(size=15)) +
-  #scale_fill_brewer(direction = -1)
+t_colab <- t_colab %>%
+  arrange(desc(Tipo)) %>%
+  mutate(ypos = cumsum(prop) - 0.5*prop)
+ggplot(t_colab, aes(x="", y=prop, fill=Tipo)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "black") +
+  theme_void() +
+  ggtitle("Porcentaje de casos Covid-19 por tipo de colaborador") +
+  guides(fill=guide_legend(title="Tipo de colaborador")) +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=15)) +
+  scale_fill_brewer(direction = -1)
 
 #BarPlot rango de edad
 r_edad <- data.frame(table(d2$rangoedad))
@@ -130,13 +159,13 @@ genero <- genero %>%
 ggplot(genero, aes(x="", y=prop, fill=Genero)) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) +
-  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "#757c91", size=10) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=10) +
   theme_void() +
   ggtitle("Porcentaje de casos Covid-19 por género") +
   guides(fill=guide_legend(title="Género")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_viridis_d(begin = 0.2, end = 0.8)
 
 #BarPlot por diagnostico
 diag <- data.frame(table(d2$diagnostico))
@@ -149,7 +178,7 @@ ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   guides(fill=guide_legend(title="Diagnóstico")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_viridis_d(begin = 0.2, end = 0.8)
 
 #Piechart por alta medica
 alta <- data.frame(table(d2$alta), data.frame(prop.table(table(d2$alta)))$Freq*100)
@@ -160,13 +189,13 @@ alta <- alta %>%
 ggplot(alta, aes(x="", y=prop, fill=Alta_Médica )) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) +
-  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "#757c91", size=10) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=10) +
   theme_void() +
   guides(fill=guide_legend(title="Alta médica")) +
   ggtitle("Porcentaje de casos Covid-19 por alta médica") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_viridis_d(begin = 0.2, end = 0.8)
 
 #BarPlot por semana de contagio
 semana <- data.frame(table(d2$semanaContagio))
@@ -208,10 +237,10 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
   
 
 #LinePlot por contagios acumulados
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_24_08_20.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_31_08_20.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
-  geom_area( fill="#42229b", alpha=0.4) +
+  geom_area( fill="#42229b", alpha=0.5) +
   geom_line(color="#36118e", size=2) +
   geom_point(size=3, color="#36118e") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
@@ -286,7 +315,7 @@ ggplot(emp_camp2, aes(fill=Empleado, y=Campus, x=Casos, label = Casos)) +
   geom_bar(position="stack", stat="identity") +
   xlab("Número de casos") + ylab("Campus") +
   geom_text(data=subset(emp_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="white", fontface = "bold") +
-  scale_fill_viridis_d() +
+  scale_fill_viridis_d(begin = 0.1, end = 0.9) +
   guides(fill=guide_legend(title="Colaborador")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
@@ -303,7 +332,7 @@ ggplot(edad_camp, aes(fill=Rango_Edad, y=Campus, x=Casos)) +
   geom_bar(position="stack", stat="identity") +
   geom_text(aes(label = paste(format(round(Casos, 3), nsmall = 3), "%", sep = "")), check_overlap = TRUE) +
   xlab("Porcentaje de casos") + ylab("Campus") +
-  scale_fill_viridis_d() +
+  scale_fill_viridis_d(begin = 0.1, end = 0.9) +
   guides(fill=guide_legend(title="Rango de edad")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=13)) +
@@ -318,7 +347,7 @@ ggplot(edad_camp2, aes(fill=Rango_Edad, y=Campus, x=Casos, label = Casos)) +
   geom_bar(position="stack", stat="identity") +
   xlab("Número de casos") + ylab("Campus") +
   geom_text(data=subset(edad_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="white", fontface = "bold") +
-  scale_fill_viridis_d() +
+  scale_fill_viridis_d(begin = 0.1, end = 0.9) +
   guides(fill=guide_legend(title="Rango de edad")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
@@ -448,5 +477,5 @@ ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) +
 #<-------------------------Tabla csv--------------------------------->
 camp_colab <- table(d2$campus, d2$tipo)
 #filter table
-write.csv(camp_colab, file = "campus_contra_colaborador2.csv")
+write.csv(camp_colab, file = "campus_contra_colaborador.csv")
 
