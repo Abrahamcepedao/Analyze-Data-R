@@ -7,7 +7,7 @@ library(dplyr)
 library(stringr)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_31_08_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_07_09_20.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 colnames(d2) <- c("nomina", "nombre", "genero", "institucion", "campus", "estado", "posicion", "corre", "celular", "tipo", "edad", "rangoedad", "inicio", "semanaContagio", "tipoContagio", "asistidoCampus", "tipoAtencion", "diagnostico", "morbilidades", "alta", "fechaAlta", "fechaFallecimiento")
 
@@ -42,13 +42,17 @@ d2$campus <- ifelse(d2$campus == "Santa Fe", "Santa Fé", d2$campus)
 
 d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "jalisco", "Jalisco", d2$estado)
 d2$estado <- ifelse(d2$estado == "Mexico", "Estado de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "México", "Estado de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "Monterrey", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Leon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "nuevo León", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "SINALOA", "Sinaloa", d2$estado)
 d2$estado <- ifelse(d2$estado == "Veracruz", "Veracrúz", d2$estado)
+
+d2$institucion <- ifelse(d2$institucion == "TECMILENIO", "Tecmilenio", d2$institucion)
 
 d2$semanaContagio <- str_trim(d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er abril", "1ra abril", d2$semanaContagio)
@@ -65,6 +69,7 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "3era junio", "3ra junio", d2$s
 d2$semanaContagio <- ifelse(d2$semanaContagio == "3er julio", "3ra julio", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "3er agosto", "3ra agosto", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Julio", "4ta julio", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er septiembre", "1ra septiembre", d2$semanaContagio)
 
 
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
@@ -78,6 +83,7 @@ d2$diagnostico <- ifelse(d2$diagnostico == "1=Ambulatorio", "Ambulatorio", d2$di
 d2$diagnostico <- ifelse(d2$diagnostico == "2=Hospitalizado", "Hospitalizado", d2$diagnostico)
 
 d2$genero <- ifelse(d2$genero == "femenino", "Femenino", d2$genero)
+d2$genero <- ifelse(d2$genero == "FEMENINO", "Femenino", d2$genero)
 
 d2$alta <- ifelse(d2$alta == "NO", "No", d2$alta)
 
@@ -237,7 +243,7 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
   
 
 #LinePlot por contagios acumulados
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_31_08_20.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_07_09_20.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
   geom_area( fill="#42229b", alpha=0.5) +
