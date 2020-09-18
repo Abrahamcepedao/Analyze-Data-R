@@ -145,6 +145,25 @@ ggplot(t_colab, aes(x="", y=prop, fill=Tipo)) +
   theme(text = element_text(size=15)) +
   scale_fill_brewer(direction = -1)
 
+#BarPlot por fallecimiennto
+fallecimiento <- data.frame(table(d2$fechaFallecimiento))
+fallecimiento$Acum <- rep(0, times = length(fallecimiento$Var1))
+colnames(fallecimiento) <- c("Fecha", "Casos", "Acum")
+acum <- 0
+for(i in 1:length(fallecimiento$Fecha)){
+  acum <- fallecimiento$Casos[i] + acum
+  fallecimiento$Acum[i] <- acum
+}
+
+ggplot(data=fallecimiento, aes(x=Fecha, y=Acum, fill=Fecha)) +
+  geom_bar(stat="identity", width=0.7, color="white") +
+  geom_text(aes(label = Acum), vjust = -0.2, size=5) +
+  ggtitle("Número de fallecimientos Covid-19 por fecha") +
+  xlab("Fecha") + ylab("Acumulación de casos") +
+  theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
+  theme(text = element_text(size=15)) + theme(legend.position="none") +
+  scale_fill_viridis_d()
+
 #BarPlot rango de edad
 r_edad <- data.frame(table(d2$rangoedad))
 colnames(r_edad) <- c("Rango","Casos")
