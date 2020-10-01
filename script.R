@@ -7,7 +7,7 @@ library(dplyr)
 library(stringr)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_16_09_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_30_09_20.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 colnames(d2) <- c("nomina", "nombre", "genero", "institucion", "campus", "estado", "posicion", "corre", "celular", "tipo", "edad", "rangoedad", "inicio", "semanaContagio", "tipoContagio", "asistidoCampus", "tipoAtencion", "diagnostico", "morbilidades", "alta", "fechaAlta", "fechaFallecimiento")
 
@@ -71,7 +71,7 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "3er agosto", "3ra agosto", d2$
 d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Agosto", "4ta agosto", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Julio", "4ta julio", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er septiembre", "1ra septiembre", d2$semanaContagio)
-
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er septiembre", "3ra septiembre", d2$semanaContagio)
 
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
 d2$tipo <- ifelse(d2$tipo == "2=Apoyo", "Apoyo", d2$tipo)
@@ -263,7 +263,7 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
   
 
 #LinePlot por contagios acumulados
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_16_09_20.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_30_09_20.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
   geom_area( fill="#42229b", alpha=0.5) +
