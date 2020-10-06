@@ -1,20 +1,4 @@
-#data
-Tasas_y_Poblacion_Tec_16072020.xlsx
-
-#colaboradres
-Colaboradores_Covid_positivos_13_08_20.xlsm
-Colaboradores_Covid_positivos_17_08_20.xlsm
-Colaboradores_Covid_positivos_24_08_20.xlsm
-Colaboradores_Covid_positivos_31_08_20.xlsm
-Colaboradores_Covid_positivos_07_09_20.xlsm
-Colaboradores_Covid_positivos_16_09_20.xlsm
-~$Colaboradores_Covid_positivos_16_09_20.xlsm
-Colaboradores_Covid_positivos_23_09_20.xlsm
-Colaboradores_Covid_positivos_30_09_20.xlsm
-
-#Campus contra colaborador
-campus_contra_colaborador.xlsx
-campus_contra_colaborador.csv
+/xlsm
 
 #RData
 .RData

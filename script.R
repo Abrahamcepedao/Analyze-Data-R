@@ -212,7 +212,19 @@ colnames(alta) <- c("Alta_Médica", "Casos", "prop")
 alta <- alta %>%
   arrange(desc(Alta_Médica)) %>%
   mutate(ypos = cumsum(prop) - 0.5*prop)
-ggplot(alta, aes(x="", y=prop, fill=Alta_Médica )) +
+
+alta2 <- data.frame(
+  Alta_Médica <- c("No", "Sí"),
+  Freq <- c(50, 526),
+  prop <- c(8.68, 91.31)
+)
+colnames(alta2) <- c("Alta_Médica", "Casos", "prop")
+alta2 <- alta2 %>%
+  arrange(desc(Alta_Médica)) %>%
+  mutate(ypos = cumsum(prop) - 0.5*prop)
+
+#altaTemp <- data.frame()
+ggplot(alta2, aes(x="", y=prop, fill=Alta_Médica )) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) +
   geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=10) +
