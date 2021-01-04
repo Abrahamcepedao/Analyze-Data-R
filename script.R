@@ -5,9 +5,10 @@ library(ggplot2)
 library(scales)
 library(dplyr)
 library(stringr)
+library(RColorBrewer)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_07_10_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_30_12_20.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 
 #Nombres de columnas
@@ -25,6 +26,7 @@ d2$campus <- ifelse(d2$campus == "C CM", "Ciudad de México", d2$campus)
 d2$campus <- ifelse(d2$campus == "CCM", "Ciudad de México", d2$campus)
 d2$campus <- ifelse(d2$campus == "C. Querétaro", "Querétaro", d2$campus)
 d2$campus <- ifelse(d2$campus == "C. Mty", "Monterrey", d2$campus)
+d2$campus <- ifelse(d2$campus == "C MTY", "Monterrey", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Sinaloa", "Sinaloa", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Veracruz", "Veracruz", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Santa Fe", "Santa Fé", d2$campus)
@@ -49,12 +51,15 @@ data$Campus <- ifelse(data$Campus == "Sonora Norte", "Sonora", data$Campus)
 #Limpiar datos de estado
 d2$estado <- str_trim(d2$estado)
 d2$estado <- ifelse(d2$estado == "CDMX", "Ciudad de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "Torreón", "Coahuila", d2$estado)
 d2$estado <- ifelse(d2$estado == "jalisco", "Jalisco", d2$estado)
 d2$estado <- ifelse(d2$estado == "Mexico", "Estado de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "México", "Estado de México", d2$estado)
+d2$estado <- ifelse(d2$estado == "Toluca", "Estado de México", d2$estado)
 d2$estado <- ifelse(d2$estado == "Monterrey", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Léon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "Nuevo Leon", "Nuevo León", d2$estado)
+d2$estado <- ifelse(d2$estado == "Nuevo leon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "nuevo León", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "SINALOA", "Sinaloa", d2$estado)
 d2$estado <- ifelse(d2$estado == "sinaloa", "Sinaloa", d2$estado)
@@ -84,6 +89,13 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Agosto", "4ta agosto", d2$
 d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Julio", "4ta julio", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er septiembre", "1ra septiembre", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "3er septiembre", "3ra septiembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er octubre", "1ra octubre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er Octubre", "3ra octubre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "4ta Octubre", "4ta octubre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er noviembre", "1ra noviembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er Noviembre", "1ra noviembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er noviembre", "3ra noviembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er de Diciembre", "1ra diciembre", d2$semanaContagio)
 
 #Limpiar datos tipo colaborador
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
@@ -100,12 +112,18 @@ d2$diagnostico <- ifelse(d2$diagnostico == "2=Hospitalizado", "Hospitalizado", d
 #Limpiar datos genero
 d2$genero <- ifelse(d2$genero == "femenino", "Femenino", d2$genero)
 d2$genero <- ifelse(d2$genero == "FEMENINO", "Femenino", d2$genero)
+d2$genero <- ifelse(d2$genero == "masculino", "Masculino", d2$genero)
 
 #Limpiar datos de tipo de alta
 d2$alta <- ifelse(d2$alta == "NO", "No", d2$alta)
+d2$alta <- ifelse(d2$alta == "no", "No", d2$alta)
 
 semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta") # numero de semanas
-meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "noviembre") # meses
+meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre") # meses
+
+
+#Color palette  config
+getPalette = colorRampPalette(brewer.pal(9, "Blues"))
 
 #BarPlot por institucion
 #institucion:
@@ -122,7 +140,7 @@ ggplot(data=inst, aes(x=Institución, y=Casos, fill=Institución)) +
   xlab("Institución") + ylab("Número de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
-  scale_fill_viridis_d()
+  scale_fill_brewer()
 
 #Piechart por institucion
 #institucion:
@@ -138,13 +156,13 @@ inst2 <- inst2 %>%
 ggplot(inst2, aes(x="", y=prop, fill=Institución)) +
   geom_bar(stat="identity") +
   coord_polar("y", start=0) +
-  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=6) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "black", size=6) +
   theme_void() +
   ggtitle("Porcentaje de casos Covid-19 por institución") +
   guides(fill=guide_legend(title="Institución")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=20)) +
-  scale_fill_viridis_d(begin = 0.1, end = 0.9)
+  scale_fill_brewer()
 
 #Piechart por Tipo de colaborador
 #tipo de colaborador:
@@ -162,7 +180,7 @@ ggplot(data=t_colab, aes(x=Tipo, y=Casos, fill=Tipo)) +
   xlab("Colaborador") + ylab("Número de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_brewer()
 
 
 #BarPlot por acumulacion de fallecimiento por fecha
@@ -176,13 +194,12 @@ for(i in 1:length(fallecimiento$Fecha)){
   fallecimiento$Acum[i] <- acum
 }
 ggplot(data=fallecimiento, aes(x=Fecha, y=Acum, fill=Fecha)) +
-  geom_bar(stat="identity", width=0.7, color="white") +
+  geom_bar(stat="identity", width=0.7, color="white", fill = getPalette(length(fallecimiento$Fecha))) +
   geom_text(aes(label = Acum), vjust = -0.2, size=5) +
   ggtitle("Número de fallecimientos Covid-19 por fecha") +
   xlab("Fecha") + ylab("Acumulación de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + theme(legend.position="none") +
-  scale_fill_viridis_d()
+  theme(text = element_text(size=15)) + theme(legend.position="none")
 
 #BarPlot rango de edad
 #rango de edad:
@@ -202,7 +219,7 @@ ggplot(data=r_edad, aes(x=Rango, y=Casos, fill=Rango)) +
   ggtitle("Número de casos Covid-19 por rango de edad") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_brewer()
 
 #Piechart por genero
 #rango de edad:
@@ -216,13 +233,13 @@ genero <- genero %>%
 ggplot(genero, aes(x="", y=prop, fill=Genero)) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) +
-  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=10) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "black", size=10) +
   theme_void() +
   ggtitle("Porcentaje de casos Covid-19 por género") +
   guides(fill=guide_legend(title="Género")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d(begin = 0.2, end = 0.8)
+  scale_fill_brewer()
 
 #BarPlot por diagnostico
 #rango de edad:
@@ -238,7 +255,7 @@ ggplot(data=diag, aes(x=Diagnostico, y=Casos, fill=Diagnostico)) +
   guides(fill=guide_legend(title="Diagnóstico")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d(begin = 0.2, end = 0.8)
+  scale_fill_brewer()
 
 #Piechart por alta medica
 #alta médica:
@@ -260,16 +277,16 @@ alta2 <- alta2 %>%
   arrange(desc(Alta_Médica)) %>%
   mutate(ypos = cumsum(prop) - 0.5*prop)
 
-ggplot(alta2, aes(x="", y=prop, fill=Alta_Médica )) +
+ggplot(alta, aes(x="", y=prop, fill=Alta_Médica )) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) +
-  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "white", size=10) +
+  geom_text(aes(y = ypos, label = paste(format(round(prop, 1), nsmall = 1), "%", sep = "")), color = "black", size=10) +
   theme_void() +
   guides(fill=guide_legend(title="Alta médica")) +
   ggtitle("Porcentaje de casos Covid-19 por alta médica") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d(begin = 0.2, end = 0.8)
+  scale_fill_brewer(direction = -1)
 
 #BarPlot por semana de contagio
 #semana de contagio:
@@ -285,13 +302,12 @@ semana <- data.frame(semana[order(semana$mes,semana$semana_num),])
 semana$Semana <- factor(semana$Semana, levels = rev(semana$Semana))
 
 ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
-  geom_bar(stat="identity", width=0.7, color="white") +
+  geom_bar(stat="identity", width=0.7, color="white", fill = getPalette(length(semana$Semana))) +
   geom_text(aes(label = Casos), hjust = -0.2, size=5) +
   xlab("Número de casos") + ylab("Semana") +
   ggtitle("Número de casos Covid-19 por semana de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + theme(legend.position="none") +
-  scale_fill_viridis_d()
+  theme(text = element_text(size=15)) + theme(legend.position="none")
 
 #BarPlot por semana de contagio por tipo  de colaborados
 #semana de contagio:
@@ -313,7 +329,8 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
   geom_text(aes(label = stat(x), group = Semana), stat = 'summary', fun = sum, hjust = -0.2, size=5) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  scale_fill_viridis_d()
+  scale_fill_brewer()
+  
   
 
 #LinePlot por contagios acumulados
@@ -322,16 +339,18 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
 #       ->  Numero de contagios en  esa fecha
 #       ->  Acumlado hasta la fecha
 #  -> Acumulador por cada día
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_07_10_20.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_30_12_20.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
-  geom_area( fill="#42229b", alpha=0.5) +
-  geom_line(color="#36118e", size=2) +
-  geom_point(size=3, color="#36118e") +
+  geom_area( fill="#1769a8", alpha=0.5) +
+  geom_line(color="#184363", size=2) +
+  geom_point(size=3, color="#184363") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  xlab("Fecha") + ylab("Contagios acumulados") +
-  ggtitle("Número de casos Covid-19 acumulados")
+  xlab("Fecha") + ylab("Coantagios acumulados") +
+  ggtitle("Número de casos Covid-19 acumulados") +
+  coord_cartesian(ylim = c(-10, 1000)) +
+  scale_color_gradient()
 
 
 #BarPlot por contagios diarios con línea  de tendencia
@@ -341,22 +360,24 @@ ggplot(data=casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Contagios, fill=
   xlab("Fecha de inicio de síntomas") + ylab("Número de casos") +
   scale_x_date(labels=date_format("%b %d"), breaks=date_breaks("2 weeks")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + stat_smooth(colour="green")  +
-  scale_fill_viridis_b(direction = -1)
+  theme(text = element_text(size=15)) + stat_smooth(colour="#1769a8")  +
+  scale_color_gradient()
+ 
 
 
 #BarPlot por estado
 #       ->  Contagios por estado
-estado <- data.frame(sort(table(d2$estado), decreasing = TRUE))
+
+estado <- data.frame(sort(table(d2$estado), decreasing = FALSE))
 colnames(estado) <- c("Estado", "Casos")
 ggplot(data=estado, aes(x=Estado, y=Casos, fill=Estado)) +
-  geom_bar(stat="identity", width=0.7, color="white") + coord_flip() +
+  geom_bar(stat="identity", width=0.7, color="white", fill = getPalette(length(estado$Estado))) + coord_flip() +
   geom_text(aes(label = Casos), hjust = -0.2) +
   xlab("Estado") + ylab("Número de casos") +
   scale_fill_viridis_d() +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
-  ggtitle("Número de casos Covid-19 por estado")
+  ggtitle("Número de casos Covid-19 por estado") 
 
 
 #<-------------------------Cruzadas------------------------------->
@@ -372,30 +393,32 @@ emp_camp2 <- emp_camp2[emp_camp2$Campus %in% campuss$Var1,]
 ggplot(emp_camp2, aes(fill=Empleado, y=Campus, x=Casos, label = Casos)) + 
   geom_bar(position="stack", stat="identity") +
   xlab("Número de casos") + ylab("Campus") +
-  geom_text(data=subset(emp_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="white", fontface = "bold") +
+  geom_text(data=subset(emp_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="black", fontface = "bold") +
   scale_fill_viridis_d(begin = 0.1, end = 0.9) +
   guides(fill=guide_legend(title="Colaborador")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  ggtitle("Número de casos Covid-19 por tipo de colaborador contra campus (total mayor que 5)")
-
+  ggtitle("Número de casos Covid-19 por tipo de colaborador contra campus (total mayor que 5)") +
+  scale_fill_brewer(direction = -1)
 
 #BarPlot rango de edad contra campus
 # -> Cruza el numero de colaboradores de cada rango de edad por campus
-edad_camp2 <- data.frame(table(d2$rangoedad, d2$campus),2)
+edad_camp2 <- data.frame(table(d2$rangoedad, d2$campus))
 colnames(edad_camp2) <- c("Rango_Edad", "Campus", "Casos")
 campus <- data.frame(table(d2$campus))
 campus <- campus[campus$Freq>5,]
 edad_camp2 <- edad_camp2[edad_camp2$Campus %in% campus$Var1,]
+edad_camp2$Colors = ifelse(edad_camp2$Rango_Edad == "0-19", "white", "black")
 ggplot(edad_camp2, aes(fill=Rango_Edad, y=Campus, x=Casos, label = Casos)) + 
   geom_bar(position="stack", stat="identity") +
   xlab("Número de casos") + ylab("Campus") +
-  geom_text(data=subset(edad_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="white", fontface = "bold") +
+  geom_text(data=subset(edad_camp2, Casos>0), size = 5, position = position_stack(vjust = 0.5), check_overlap = FALSE, colour="black", fontface = "bold") +
   scale_fill_viridis_d(begin = 0.1, end = 0.9) +
   guides(fill=guide_legend(title="Rango de edad")) +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  ggtitle("Número de casos Covid-19 por rango de edad contra campus (total mayor que 5)")
+  ggtitle("Número de casos Covid-19 por rango de edad contra campus (total mayor que 5)") +
+  scale_fill_brewer(direction = -1)
 
   
 #BarPlot institucion contra tipo de colaborador
@@ -408,7 +431,9 @@ ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) +
   xlab("Porcentaje de casos") + ylab("Institución") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) +
-  ggtitle("Porcentaje de casos Covid-19 por institución contra tipo de colaborador")
+  ggtitle("Porcentaje de casos Covid-19 por institución contra tipo de colaborador") +
+  scale_fill_brewer()
+
 
 
 #<-------------------------graficas filtradas------------------------------->
@@ -418,26 +443,24 @@ ggplot(inst_colab, aes(fill=Colaborador, y=Institucion, x=Casos)) +
 inst_hos <- data.frame(table(d2$institucion[d2$diagnostico == "Hospitalizado"]))
 colnames(inst_hos) <- c("Institucion", "Casos")
 ggplot(inst_hos, aes(fill=Institucion, y=Casos, x=Institucion)) + 
-  geom_bar(position="stack", stat="identity") + coord_flip() + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(length(inst_hos$Institucion))) + coord_flip() + 
   xlab("Institución") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
   geom_text(aes(label = Casos), hjust = -0.2, size=5) +
-  ggtitle("Número de casos Covid-19 hospitalizados por institución") +
-  scale_fill_viridis_d() 
+  ggtitle("Número de casos Covid-19 hospitalizados por institución")
 
 #BarPlot hospitalizados por campus
 # -> Numero de colaboradores hospitalizados por cada campus
 campus_hos <- data.frame(table(d2$campus[d2$diagnostico == "Hospitalizado"]))
 colnames(campus_hos) <- c("Campus", "Casos")
 ggplot(campus_hos, aes(fill=Campus, y=Casos, x=Campus)) + 
-  geom_bar(position="stack", stat="identity") + coord_flip() + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(length(campus_hos$Campus))) + coord_flip() + 
   xlab("Campus") + ylab("Número de casos hospitalizados") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=15)) + theme(legend.position="none") +
   geom_text(aes(label = Casos), hjust = -0.2, size=5) +
-  ggtitle("Número de casos Covid-19 hospitalizados por campus") +
-  scale_fill_viridis_d() 
+  ggtitle("Número de casos Covid-19 hospitalizados por campus")
 
 #Bar Plot dato generales (casos totales, %de casos hospitalizados, diferencia de con semana anterior, positividad general)
 data <- data.frame(read_excel("Tasas_y_Poblacion_Tec_16072020.xlsx", sheet = "Población Tec"))
@@ -450,13 +473,12 @@ general_data2 <- data.frame(
 )
 
 ggplot(general_data2, aes(fill=Dato, y=Casos, x=Dato)) + 
-  geom_bar(position="stack", stat="identity") + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(3)) + 
   ylab("") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
   geom_text(aes(label = paste(round(Casos,2), "%", sep="")), vjust = -0.2, size=8) +
-  ggtitle("Porcentajes de datos generales Covid-19") +
-  scale_fill_viridis_d() 
+  ggtitle("Porcentajes de datos generales Covid-19")
 
 #BarPlot semanas con menor y mayor cantidad de contagios, semana anterior, semana actual y la diferencia entre las últimas dos
 general_data3 <- data.frame(
@@ -468,13 +490,12 @@ semanas <-  c("Semana min", "Semana max", "Semana anterior", "Semana actual", "D
 general_data3$Semana <- factor(general_data3$Semana, levels = semanas)
 
 ggplot(general_data3, aes(fill=Semana, y=Casos, x=Semana)) + 
-  geom_bar(position="stack", stat="identity") + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(5)) + 
   ylab("") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), vjust = -0.2, size=8) +
-  ggtitle("Datos respecto a contagios semanales Covid-19") +
-  scale_fill_viridis_d() 
+  geom_text(aes(label = Casos), vjust = ifelse(general_data3$Semana == "Diferencia", -6.3, -0.2), size=8) +
+  ggtitle("Datos respecto a contagios semanales Covid-19")
 
 #BarPlot de  casos totales en el campus e instituciones con mayor cantidad de casos, asi como los casos totales
 max_campus <- data.frame(table(d2$campus))
@@ -491,13 +512,12 @@ data4_order <- c(paste("Campus max (", max_campus$Var1[dim(max_campus)][1], ")",
 general_data4$Dato <- factor(general_data4$Dato, data4_order)
 
 ggplot(general_data4, aes(fill=Dato, y=Casos, x=Dato)) + 
-  geom_bar(position="stack", stat="identity") + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(3)) + 
   ylab("") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
   geom_text(aes(label = Casos), vjust = -0.2, size=8) +
-  ggtitle("Datos de casos totales Covid-19") +
-  scale_fill_viridis_d() 
+  ggtitle("Datos de casos totales Covid-19")
 
 
 #<-------------------------graficas porcentuales------------------------------->
@@ -511,15 +531,17 @@ campus_totales <- campus_totales[order(campus_totales$campus_totales.Campus),]
 campus_comp$total <- campus_totales$campus_totales.TOTAL.Colaboradores
 colnames(campus_comp) <- c("Campus", "Casos", "Total")
 
+colourCount = length(campus_comp$Campus)
+getPalette = colorRampPalette(brewer.pal(9, "Blues"))
+
 ggplot(campus_comp, aes(fill=Campus, y=(Casos/Total*100), x=Campus)) + 
-  geom_bar(position="stack", stat="identity") + 
+  geom_bar(position="stack", stat="identity", fill = getPalette(colourCount)) + 
   ylab("") + xlab("") + coord_flip() +
   xlab("Campus") + ylab("Porcentaje de tasa de contagio") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
   geom_text(aes(label = paste(round(Casos/Total*100,2), "%", sep = "")), hjust = -0.05, size=5) +
-  ggtitle("Tasa de contagio por campus Covid-19") + 
-  scale_fill_viridis_d() 
+  ggtitle("Tasa de contagio por campus Covid-19")
 
 #<-------------------------Tabla csv--------------------------------->
 #Genera table con los casos de cada tipo de colaborador por campus
