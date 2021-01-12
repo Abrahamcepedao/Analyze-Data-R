@@ -8,7 +8,7 @@ library(stringr)
 library(RColorBrewer)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_30_12_20.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores_Covid_positivos_06_01_21.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 
 #Nombres de columnas
@@ -96,6 +96,8 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "1er noviembre", "1ra noviembre
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er Noviembre", "1ra noviembre", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "3er noviembre", "3ra noviembre", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er de Diciembre", "1ra diciembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er Diciembre", "1ra diciembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "3er diciembre", "3ra diciembre", d2$semanaContagio)
 
 #Limpiar datos tipo colaborador
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
@@ -199,7 +201,7 @@ ggplot(data=fallecimiento, aes(x=Fecha, y=Acum, fill=Fecha)) +
   ggtitle("Número de fallecimientos Covid-19 por fecha") +
   xlab("Fecha") + ylab("Acumulación de casos") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
-  theme(text = element_text(size=15)) + theme(legend.position="none")
+  theme(text = element_text(size=15), axis.text.x = element_text(angle=75, hjust=1)) + theme(legend.position="none")
 
 #BarPlot rango de edad
 #rango de edad:
@@ -301,6 +303,14 @@ semana$mes <- factor(semana$mes, levels = meses)
 semana <- data.frame(semana[order(semana$mes,semana$semana_num),])
 semana$Semana <- factor(semana$Semana, levels = rev(semana$Semana))
 
+#Generar csv con datos historicos de casos acumulados por semana de inicio de síntomas
+semanaP <- data.frame(
+  Semana <- semana$Semana,
+  Casos <- semana$Casos
+)
+colnames(semanaP) <- c("Semana de Contagio", "Casos")
+write.csv(semanaP, file = "campus_contra_colaborador.csv")
+
 ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
   geom_bar(stat="identity", width=0.7, color="white", fill = getPalette(length(semana$Semana))) +
   geom_text(aes(label = Casos), hjust = -0.2, size=5) +
@@ -339,8 +349,9 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
 #       ->  Numero de contagios en  esa fecha
 #       ->  Acumlado hasta la fecha
 #  -> Acumulador por cada día
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_30_12_20.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_06_01_21.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
+casosTotalAcum <- casos$Acumulados[length(casos$Acumulados)]
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
   geom_area( fill="#1769a8", alpha=0.5) +
   geom_line(color="#184363", size=2) +
@@ -349,7 +360,7 @@ ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
   theme(text = element_text(size=15)) +
   xlab("Fecha") + ylab("Coantagios acumulados") +
   ggtitle("Número de casos Covid-19 acumulados") +
-  coord_cartesian(ylim = c(-10, 1000)) +
+  coord_cartesian(ylim = c(-10, casosTotalAcum + 50)) +
   scale_color_gradient()
 
 
@@ -494,7 +505,7 @@ ggplot(general_data3, aes(fill=Semana, y=Casos, x=Semana)) +
   ylab("") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), vjust = ifelse(general_data3$Semana == "Diferencia", -6.3, -0.2), size=8) +
+  geom_text(aes(label = Casos), vjust = ifelse(general_data3$Semana == "Diferencia", -0.2, -0.2), size=8) +
   ggtitle("Datos respecto a contagios semanales Covid-19")
 
 #BarPlot de  casos totales en el campus e instituciones con mayor cantidad de casos, asi como los casos totales
