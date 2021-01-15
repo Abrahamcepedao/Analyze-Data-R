@@ -8,7 +8,7 @@ library(stringr)
 library(RColorBrewer)
 
 setwd("~/Documents/OnCampusJob/propuesta-graficos-covid-19/Analyze-Data-R")
-d <- read_excel("Colaboradores_Covid_positivos_06_01_21.xlsm", sheet = "BD")
+d <- read_excel("Colaboradores Covid positivos 13_01_2021.xlsm", sheet = "BD")
 d2 <- as.data.frame(d)
 
 #Nombres de columnas
@@ -27,6 +27,7 @@ d2$campus <- ifelse(d2$campus == "CCM", "Ciudad de México", d2$campus)
 d2$campus <- ifelse(d2$campus == "C. Querétaro", "Querétaro", d2$campus)
 d2$campus <- ifelse(d2$campus == "C. Mty", "Monterrey", d2$campus)
 d2$campus <- ifelse(d2$campus == "C MTY", "Monterrey", d2$campus)
+d2$campus <- ifelse(d2$campus == "Of. Monterrey", "Monterrey", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Sinaloa", "Sinaloa", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Veracruz", "Veracruz", d2$campus)
 d2$campus <- ifelse(d2$campus == "C Santa Fe", "Santa Fé", d2$campus)
@@ -63,6 +64,7 @@ d2$estado <- ifelse(d2$estado == "Nuevo leon", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "nuevo León", "Nuevo León", d2$estado)
 d2$estado <- ifelse(d2$estado == "SINALOA", "Sinaloa", d2$estado)
 d2$estado <- ifelse(d2$estado == "sinaloa", "Sinaloa", d2$estado)
+d2$estado <- ifelse(d2$estado == "San Luis Potosi", "San Luis Potosí", d2$estado)
 d2$estado <- ifelse(d2$estado == "Veracruz", "Veracrúz", d2$estado)
 
 #Limpiar datos de institucion
@@ -98,6 +100,9 @@ d2$semanaContagio <- ifelse(d2$semanaContagio == "3er noviembre", "3ra noviembre
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er de Diciembre", "1ra diciembre", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "1er Diciembre", "1ra diciembre", d2$semanaContagio)
 d2$semanaContagio <- ifelse(d2$semanaContagio == "3er diciembre", "3ra diciembre", d2$semanaContagio)
+d2$semanaContagio <- ifelse(d2$semanaContagio == "1er enero", "1ra enero", d2$semanaContagio)
+
+
 
 #Limpiar datos tipo colaborador
 d2$tipo <- ifelse(d2$tipo == "1=Académico", "Académico", d2$tipo)
@@ -120,8 +125,6 @@ d2$genero <- ifelse(d2$genero == "masculino", "Masculino", d2$genero)
 d2$alta <- ifelse(d2$alta == "NO", "No", d2$alta)
 d2$alta <- ifelse(d2$alta == "no", "No", d2$alta)
 
-semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta") # numero de semanas
-meses <- c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre") # meses
 
 
 #Color palette  config
@@ -293,14 +296,26 @@ ggplot(alta, aes(x="", y=prop, fill=Alta_Médica )) +
 #BarPlot por semana de contagio
 #semana de contagio:
 #  -> Semanda y cantidad de contagios en la semana
+d2$semanaContagio <- substr(d2$semanaContagio,1,7)
+for(i in 1:length(d2$semanaContagio)){
+  num = ifelse(d2$semanaContagio[i] == "5ta dic" && substr(d2$inicio[i],6,7) == "01", toString(as.numeric(substr(d2$inicio[i],1,4))-1), substr(d2$inicio[i],1,4))
+  d2$semanaContagio[i] <- paste(d2$semanaContagio[i], num);
+}
+#d2$semanaContagio <- ifelse(d2$semanaContagio == "5ta dic" && substr(d2$inicio,6,7) == "01", paste(d2$semanaContagio,toString(as.numeric(substr(d2$inicio,1,4))-1)), paste(d2$semanaContagio, substr(d2$inicio,1,4)))
+
+semana_num <- c("1ra", "2da", "3ra", "4ta", "5ta") # numero de semanas
+meses <- c("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic") # meses
 semana <- data.frame(table(d2$semanaContagio))
 colnames(semana) <- c("Semana", "Casos")
 
 semana$semana_num <- substr(semana$Semana,1,3)
-semana$mes <- str_trim(substring(semana$Semana,4))
+semana$mes <- str_trim(substring(semana$Semana,4,7))
+semana$year <- substring(semana$Semana,8)
+semana$year <-  factor(semana$year)
 semana$semana_num <- factor(semana$semana_num, levels = semana_num)
 semana$mes <- factor(semana$mes, levels = meses)
-semana <- data.frame(semana[order(semana$mes,semana$semana_num),])
+
+semana <- data.frame(semana[order(semana$year,semana$mes,semana$semana_num),])
 semana$Semana <- factor(semana$Semana, levels = rev(semana$Semana))
 
 #Generar csv con datos historicos de casos acumulados por semana de inicio de síntomas
@@ -309,7 +324,7 @@ semanaP <- data.frame(
   Casos <- semana$Casos
 )
 colnames(semanaP) <- c("Semana de Contagio", "Casos")
-write.csv(semanaP, file = "campus_contra_colaborador.csv")
+#write.csv(semanaP, file = "historicos.csv")
 
 ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
   geom_bar(stat="identity", width=0.7, color="white", fill = getPalette(length(semana$Semana))) +
@@ -326,10 +341,12 @@ ggplot(data=semana, aes(x=Casos, y=Semana, fill=Semana)) +
 semana2 <- data.frame(table(d2$semanaContagio, d2$tipo))
 colnames(semana2) <- c("Semana", "Colaborador", "Casos")
 semana2$semana_num <- substr(semana2$Semana,1,3)
-semana2$mes <- str_trim(substring(semana2$Semana,4))
+semana2$mes <- str_trim(substring(semana2$Semana,5,7))
+semana2$year <- substring(semana2$Semana,8)
 semana2$semana_num <- factor(semana2$semana_num, levels = semana_num)
 semana2$mes <- factor(semana2$mes, levels = meses)
-semana2 <- data.frame(semana2[order(semana2$mes,semana2$semana_num),])
+semana2$year <-  factor(semana2$year)
+semana2 <- data.frame(semana2[order(semana2$year,semana2$mes, semana2$semana_num),])
 semana2$Semana <- factor(semana2$Semana, levels = unique(rev(semana2$Semana)))
 
 ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) + 
@@ -349,7 +366,7 @@ ggplot(data = semana2, aes(x = Casos, y = Semana, fill = Colaborador)) +
 #       ->  Numero de contagios en  esa fecha
 #       ->  Acumlado hasta la fecha
 #  -> Acumulador por cada día
-casos <- as.data.frame(read_excel("Colaboradores_Covid_positivos_06_01_21.xlsm", sheet = "Contagios"))
+casos <- as.data.frame(read_excel("Colaboradores Covid positivos 13_01_2021.xlsm", sheet = "Contagios"))
 colnames(casos) <- c("Fecha", "Contagios", "Acumulados")
 casosTotalAcum <- casos$Acumulados[length(casos$Acumulados)]
 ggplot(casos, aes(x=as.Date(Fecha, origin="1899-12-30"), y=Acumulados)) +
@@ -505,7 +522,7 @@ ggplot(general_data3, aes(fill=Semana, y=Casos, x=Semana)) +
   ylab("") + xlab("") +
   theme(plot.title = element_text(lineheight=.8, face="bold", size = 18)) +
   theme(text = element_text(size=17)) + theme(legend.position="none") +
-  geom_text(aes(label = Casos), vjust = ifelse(general_data3$Semana == "Diferencia", -0.2, -0.2), size=8) +
+  geom_text(aes(label = Casos), vjust = ifelse(general_data3$Semana == "Diferencia", -5.2, -0.2), size=8) +
   ggtitle("Datos respecto a contagios semanales Covid-19")
 
 #BarPlot de  casos totales en el campus e instituciones con mayor cantidad de casos, asi como los casos totales
